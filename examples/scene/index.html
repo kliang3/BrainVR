@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Patient 1</title>
+     <script src="aframe.js"></script>
+     <script src="aframe-keyboard-controls.js"></script>
+    <script src="../../bundle.js"></script>
+  </head>
+  <body>
+    <a-scene proxy-controls="debug: true; enableOverlay: true;">
+      <a-entity camera position="5 1 10" 
+                look-controls
+                wasd-controls
+                keyboard-controls>
+             <a-cursor color="#2E3A87">
+      </a-entity>
+   <a-entity obj-model="obj: url(./assets/brain2/cerebrum.obj); mtl:url(./assets/brain2/cerebrum.obj.mtl)" rotation="-90 0 0" transparency:"true">
+    <!--<a-animation attribute="rotation"  repeat="indefinite" dur="10000" to="-90 360 0"></a-animation>-->
+   </a-entity>
+
+  <a-entity obj-model="obj: url(./assets/brain2/cc1.obj); mtl:url(./assets/brain2/cc1.obj.mtl);"
+  rotation="-90 0 0"
+  >
+  </a-entity>
+  <a-entity obj-model="obj: url(./assets/brain2/CC2.obj); mtl:url(./assets/brain2/CC2.obj.mtl)"
+  rotation="-90 0 0"></a-entity>
+  <a-entity obj-model="obj: url(./assets/brain2/cerebellum.obj); mtl:url(./assets/brain2/cerebellum.obj.mtl)"
+  rotation="-90 0 0">
+   <a-animation attribute="translate" begin="click" repeat="indefinite" to="90 0 0">
+</a-entity>
+ 
+  <a-entity obj-model="obj: url(./assets/brain2/fornix.obj); mtl:url(./assets/brain2/fornix.obj.mtl)"
+  rotation="-90 0 0"></a-entity>
+  <a-entity obj-model="obj: url(./assets/brain2/pituitary.obj); mtl:url(./assets/brain2/pituitary.obj.mtl)"
+  rotation="-90 0 0"></a-entity>
+
+  <a-entity obj-model="obj: url(./assets/brain2/pons.obj); mtl:url(./assets/brain2/pons.obj.mtl)"
+  rotation="-90 0 0"></a-entity>
+
+  <a-entity obj-model="obj: url(./assets/brain2/thalamus.obj); mtl:url(./assets/brain2/thalamus.obj.mtl)"
+  rotation="-90 0 0"></a-entity>
+  
+     
+      <a-sky color="black"></a-sky>
+
+      <!--
+        Lighting-->
+     
+      <a-light type="ambient" color="white"></a-light>
+     
+    </a-scene>
+  </body>
+</html>

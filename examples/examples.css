@@ -1,0 +1,19 @@
+html {
+  background: black;
+  color: white;
+  font-family: monospace;
+  font-size: 20px;
+  padding: 10px 20px;
+}
+body {
+  max-width: 50em;
+  line-height: 2.0em;
+}
+h1 {
+  font-weight: 3000;
+  text-align: center;
+}
+a {
+  color: #EEEEEE;
+  padding: 15px 0;
+}
