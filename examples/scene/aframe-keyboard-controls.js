@@ -89,21 +89,30 @@
 	 */
 	module.exports = {
 	  schema: {
+	 
 	    easing:            { default: 20 },
 	    acceleration:      { default: 65 },
 	    enabled:           { default: true },
 	    fly:               { default: false },
 	    rollAxis:          { default: 'z', oneOf: [ 'x', 'y', 'z' ] },
 	    pitchAxis:         { default: 'x', oneOf: [ 'x', 'y', 'z' ] },
+	    yawAxis:           { default: 'y', oneOf: [ 'x', 'y', 'z' ] },
 	    rollAxisInverted:  { default: false },
 	    rollAxisEnabled:   { default: true },
 	    pitchAxisInverted: { default: false },
 	    pitchAxisEnabled:  { default: true },
-	    debug:             { default: false }
+	    yawAxisInverted:   { default: false },
+	    yawAxisEnabled:    { default: true },
+	    debug:             { default: false },
+
+	    //added for rotation 
+	    cameraUse: 	       { default: true } 
 	  },
 
-	  init: function () {
+
+	init: function () {
 	    this.velocity = new THREE.Vector3();
+	    this.angle= new THREE.Euler();
 	    this.localKeys = {};
 	    this.listeners = {
 	      keydown: this.onKeyDown.bind(this),
@@ -122,7 +131,9 @@
 	  * Movement
 	  */
 
-	  tick: function () { this.update(); },
+	  tick: function () { 
+	  	this.update(); 
+	  },
 
 	  update: function (previousData) {
 	    var data = this.data;
@@ -133,55 +144,132 @@
 	    var time = window.performance.now();
 	    var delta = (time - prevTime) / 1000;
 	    var keys = this.getKeys();
+
 	    var movementVector;
 	    var pitchAxis = data.pitchAxis;
 	    var rollAxis = data.rollAxis;
+	    var yawAxis = data.yawAxis;
 	    var pitchSign = data.pitchAxisInverted ? -1 : 1;
 	    var rollSign = data.rollAxisInverted ? -1 : 1;
+	    var yawSign = data.yawAxisInverted ? -1 : 1;
 	    var el = this.el;
 	    this.prevTime = time;
+
+	    //added for rotation 
+	    var angle = this.angle;
+	    var object3D = el.object3D; 
+	    var rotationVector;
+	 	object3D.rotation.order='YXZ';
 
 	    // If data changed or FPS too low, reset velocity.
 	    if (previousData || delta > MAX_DELTA) {
 	      velocity[pitchAxis] = 0;
 	      velocity[rollAxis] = 0;
+	      velocity[yawAxis] = 0;
+
+	      //added for rotation 
+	      angle[pitchAxis] = 0;
+	      angle[rollAxis] = 0;
+	      angle[yawAxis] = 0;
+	      //
+
 	      return;
 	    }
 
-	    velocity[pitchAxis] -= velocity[pitchAxis] * easing * delta;
-	    velocity[rollAxis] -= velocity[rollAxis] * easing * delta;
+	    if (data.cameraUse){
+		    velocity[pitchAxis] -= velocity[pitchAxis] * easing * delta;
+		    velocity[rollAxis] -= velocity[rollAxis] * easing * delta;
+		    velocity[yawAxis] -= velocity[yawAxis] * easing * delta;
+		}
+
+	    else if (!data.cameraUse){
+		    angle[pitchAxis] -= angle[pitchAxis] * easing * delta;
+		    angle[rollAxis] -= angle[rollAxis] * easing * delta;
+		    angle[yawAxis] -= angle[yawAxis] * easing * delta;
+		}    
 
 	    var position = el.getComputedAttribute('position');
 
-	    if (data.enabled) {
-	      if (data.pitchAxisEnabled) {
-	        if (keys.KeyA || keys.ArrowLeft)  {
-	          velocity[pitchAxis] -= pitchSign * acceleration * delta;
-	        }
-	        if (keys.KeyD || keys.ArrowRight) {
-	          velocity[pitchAxis] += pitchSign * acceleration * delta;
-	        }
-	      }
-	      if (data.rollAxisEnabled) {
-	        if (keys.KeyW || keys.ArrowUp)   {
-	          velocity[rollAxis] -= rollSign * acceleration * delta;
-	        }
-	        if (keys.KeyS || keys.ArrowDown) {
-	          velocity[rollAxis] += rollSign * acceleration * delta;
-	        }
-	      }
-	    }
+	    //added for rotation 
+	    var rotation = el.getComputedAttribute('rotation');
 
-	    movementVector = this.getMovementVector(delta);
-	    el.object3D.translateX(movementVector.x);
-	    el.object3D.translateY(movementVector.y);
-	    el.object3D.translateZ(movementVector.z);
+        if (data.cameraUse){
+		    if (data.enabled) {
+		      if (data.pitchAxisEnabled) {
+		        if (keys.KeyA)  {
+		          velocity[pitchAxis] -= pitchSign * acceleration * delta;
+		        }
+		        if (keys.KeyD) {
+		          velocity[pitchAxis] += pitchSign * acceleration * delta;
+		        }
+		      }
+		      if (data.rollAxisEnabled) {
+		        if (keys.KeyW)   {
+		          velocity[rollAxis] -= rollSign * acceleration * delta;
+		        }
+		        if (keys.KeyS) {
+		          velocity[rollAxis] += rollSign * acceleration * delta;
+		        }
+		      }
+		      if (data.yawAxisEnabled) {
+		        if (keys.KeyQ)   {
+		          velocity[yawAxis] -= yawSign * acceleration * delta;
+		        }
+		        if (keys.KeyE) {
+		          velocity[yawAxis] += yawSign * acceleration * delta;
+		        }
+		      }
+		    }
+		}
 
-	    el.setAttribute('position', {
-	      x: position.x + movementVector.x,
-	      y: position.y + movementVector.y,
-	      z: position.z + movementVector.z
-	    });
+		//added for rotation 
+		else if(!data.cameraUse){
+			if (data.enabled) {
+		      if (data.pitchAxisEnabled) {
+		        if (keys.KeyJ)  {
+		          angle[pitchAxis] -= pitchSign * acceleration * delta;
+		        }
+		        if (keys.KeyL) {
+		          angle[pitchAxis] += pitchSign * acceleration * delta;
+		        }
+		      }
+		      if (data.rollAxisEnabled) {
+		        if (keys.KeyI)   {
+		          angle[rollAxis] -= rollSign * acceleration * delta;
+		        }
+		        if (keys.KeyK) {
+		          angle[rollAxis] += rollSign * acceleration * delta;
+		        }
+		      }
+		      if (data.yawAxisEnabled) {
+		        if (keys.KeyU)   {
+		          angle[yawAxis] -= yawSign * acceleration * delta;
+		        }
+		        if (keys.KeyO) {
+		          angle[yawAxis] += yawSign * acceleration * delta;
+		        }
+		      }
+		    }
+		}
+
+	    if (data.cameraUse){
+		    movementVector = this.getMovementVector(delta);
+		    el.setAttribute('position', {
+		      x: position.x + movementVector.x,
+		      y: position.y + movementVector.y,
+		      z: position.z + movementVector.z
+		    });
+		}
+
+	    //added for rotation 
+
+	    else if (!data.cameraUse){
+		    el.setAttribute('rotation',{
+		      x: rotation.x + angle.x,
+		      y: rotation.y + angle.y,
+		      z: rotation.z + angle.z
+		    });
+		}
 	  },
 
 	  getMovementVector: (function (delta) {
@@ -199,7 +287,8 @@
 	      direction.applyEuler(rotation);
 	      return direction;
 	    };
-	  })(),
+	  })
+	  (),
 
 	  /*******************************************************************
 	  * Events
